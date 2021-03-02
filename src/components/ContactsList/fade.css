@@ -1,0 +1,32 @@
+.e-fade-enter {
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+.e-fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 250ms linear;
+}
+
+.e-fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.e-fade-exit-active {
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: all 250ms linear;
+}
+
+.e-fade-appear {
+  transform: translateX(-10%);
+  opacity: 0;
+}
+
+.e-fade-appear-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 500ms linear;
+}

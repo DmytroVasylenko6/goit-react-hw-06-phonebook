@@ -1,0 +1,44 @@
+.button {
+  font-family: 'Raleway', sans-serif;
+  width: auto;
+  height: auto;
+  padding: 7px 9px;
+  background-color: #ffffff;
+  font-size: 25px;
+  font-weight: 400;
+  border-radius: 5px;
+  border: 1px solid #acacac;
+  box-shadow: 0px 2px 6px -2px rgba(0, 0, 0, 0.2);
+  outline: none;
+  transition: all 0.5s ease;
+  cursor: pointer;
+}
+
+.blueColor {
+  width: 400px;
+  background: #9b9ea0;
+  color: #ffffff;
+}
+
+.blueColor:hover,
+.blueColor:focus {
+  background-color: #8b8585;
+  transition: all 0.5s ease;
+}
+
+.blueColor:active {
+  background-color: #5f5f5f;
+  transition: all 0.5s ease;
+}
+
+.redColor:hover,
+.redColor:focus {
+  background-color: #c55b3a;
+}
+
+.redColor {
+  background-color: #4d3b3b94;
+  color: #ffffff;
+  border: 0;
+  margin-left: 15px;
+}
