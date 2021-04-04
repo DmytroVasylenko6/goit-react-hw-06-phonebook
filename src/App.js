@@ -7,8 +7,6 @@ import Input from './components/Input/Input';
 import Container from './components/Container/Container';
 import { CSSTransition } from 'react-transition-group';
 import fadeFindContacts from './fadeFindContacts.module.css';
-import fadeNotification from './fadeNotification.module.css';
-import Notification from './components/Notification';
 import * as contactsAction from './redux/contacts/contacts-actions';
 import { connect } from 'react-redux';
 
@@ -35,52 +33,20 @@ class App extends Component {
 
   inputFindId = shortid.generate();
 
-  handleSubmitForm = newContact => {
- 
-    if (newContact.name === '') {
-      this.visibleMessage('Please enter contact name!');
-      return;
-    };
-    if (newContact.number === '') {
-      this.visibleMessage('Please enter contact phone number!');
-      return;
-    };
-
-    const hasContact = this.props.contacts.some(
-      contact => contact.name === newContact.name,
-    );
-
-    if (hasContact) {
-      this.visibleMessage(`${newContact.name} is already in contacts!`);
-    } else {
-      this.props.onAddContacts(newContact);
-    };
-  };
-
-  visibleMessage = (stringMessage) => {
-        this.setState({ message: stringMessage, alert: true })
-      setTimeout(() => {
-        this.setState({ alert: false })
-      }, 3000)
-  }
-
   handleFindChange = event => {
     const filterValue = event.currentTarget;
     this.props.onFilterContacts(filterValue.value);
   };
 
   render() {
-    const { message, alert } = this.state;
+    
     const { contacts, filter } = this.props;
 
   
     return (
       <>
         <Section title="PhoneBook" appear={true} styles="phonebook">
-          <CSSTransition in={alert} timeout={1000} classNames={fadeNotification} unmountOnExit>
-            <Notification text={message} color="red"/>
-          </CSSTransition>
-          <Form Submit={this.handleSubmitForm} />
+          <Form/>
         </Section>
     
         <Section title="Contacts" >
@@ -123,7 +89,6 @@ const mapStateToProps = (state) => ({
 
     const mapDispatchToProps = (dispatch) => ({
       onParseContacts: (contacts) => { dispatch(contactsAction.contactsParse(contacts)) },
-      onAddContacts: (newContacts) => { dispatch(contactsAction.contactAdd(newContacts)) },
       onFilterContacts: (filter) => {dispatch(contactsAction.contactFilter(filter))}
     })
 
