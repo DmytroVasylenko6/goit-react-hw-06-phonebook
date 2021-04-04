@@ -24,5 +24,5 @@ export default function Notification({ text, color }) {
 }
 
 Notification.propTypes = {
-  text: PropTypes.string.isRequired,
+  text: PropTypes.string,
 };

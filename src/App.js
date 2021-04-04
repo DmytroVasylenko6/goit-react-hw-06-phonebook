@@ -9,16 +9,11 @@ import { CSSTransition } from 'react-transition-group';
 import fadeFindContacts from './fadeFindContacts.module.css';
 import fadeNotification from './fadeNotification.module.css';
 import Notification from './components/Notification';
+import * as contactsAction from './redux/contacts/contacts-actions';
+import { connect } from 'react-redux';
 
 class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: '',
     messsage: '',
     alert: null
   };
@@ -28,82 +23,57 @@ class App extends Component {
     const parseContacts = JSON.parse(contacts);
       
       if (parseContacts) {
-        this.setState({ contacts: parseContacts })
+        this.props.onParseContacts(parseContacts);
       }
-  }
+  };
   
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts))
+    if (this.props.contacts !== prevProps.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.props.contacts))
     }
   }
 
   inputFindId = shortid.generate();
 
-  deleteContact = contactId => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
-    }));
-  };
-
-  handleSubmitForm = formdata => {
-    const newContact = {
-      id: shortid.generate(),
-      ...formdata,
+  handleSubmitForm = newContact => {
+ 
+    if (newContact.name === '') {
+      this.visibleMessage('Please enter contact name!');
+      return;
+    };
+    if (newContact.number === '') {
+      this.visibleMessage('Please enter contact phone number!');
+      return;
     };
 
-    if (newContact.name === '') {
-      // alert('Please enter contact name');
-      this.setState({ message: 'Please enter contact name!', alert: true })
-      setTimeout(() => {
-        this.setState({ alert: false })
-      }, 3000)
-      return;
-    }
-    if (newContact.number === '') {
-      // alert('Please enter contact phone number');
-      this.setState({ message: 'Please enter contact phone number!', alert: true })
-      setTimeout(() => {
-        this.setState({ alert: false })
-      }, 3000)
-      return;
-    }
-
-    const hasContact = this.state.contacts.some(
+    const hasContact = this.props.contacts.some(
       contact => contact.name === newContact.name,
     );
 
     if (hasContact) {
-      // alert(`${newContact.name} is already in contacts`)
-      this.setState({ message: `${newContact.name} is already in contacts!`, alert: true })
+      this.visibleMessage(`${newContact.name} is already in contacts!`);
+    } else {
+      this.props.onAddContacts(newContact);
+    };
+  };
+
+  visibleMessage = (stringMessage) => {
+        this.setState({ message: stringMessage, alert: true })
       setTimeout(() => {
         this.setState({ alert: false })
       }, 3000)
-    } else {
-      this.setState(prevState => ({
-        contacts: [...prevState.contacts, newContact],
-      }));
-    }
-  };
+  }
 
   handleFindChange = event => {
-    const { name, value } = event.currentTarget;
-    this.setState({ [name]: value });
-  };
-
-  getVisibleContacts = () => {
-    const { contacts, filter } = this.state;
-    const normalizeFilter = filter.toLowerCase();
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizeFilter),
-    );
+    const filterValue = event.currentTarget;
+    this.props.onFilterContacts(filterValue.value);
   };
 
   render() {
-    const { filter, contacts, message, alert } = this.state;
+    const { message, alert } = this.state;
+    const { contacts, filter } = this.props;
 
-    const visibleContacts = this.getVisibleContacts();
-
+  
     return (
       <>
         <Section title="PhoneBook" appear={true} styles="phonebook">
@@ -137,14 +107,24 @@ class App extends Component {
             </span>
           ) : (
             <ContactsList
-              contacts={visibleContacts}
-              onDeleteContact={this.deleteContact}
+              contacts={contacts}
             />
-          )}
+           )} 
         </Section>
       </>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+    contacts: state.contacts.items,
+    filter: state.contacts.filter
+  })
+
+    const mapDispatchToProps = (dispatch) => ({
+      onParseContacts: (contacts) => { dispatch(contactsAction.contactsParse(contacts)) },
+      onAddContacts: (newContacts) => { dispatch(contactsAction.contactAdd(newContacts)) },
+      onFilterContacts: (filter) => {dispatch(contactsAction.contactFilter(filter))}
+    })
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

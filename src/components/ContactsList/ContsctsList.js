@@ -3,8 +3,10 @@ import s from './ContactsList.module.css';
 import './fade.css'
 import Button from '../Button/Button';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { connect } from 'react-redux';
+import * as contactsAction from '../../redux/contacts/contacts-actions'
 
-export default function ContactsList({ contacts, onDeleteContact }) {
+ const ContactsList = ({ contacts, onDeleteContact }) => {
   return (
     <>
       <TransitionGroup component="ul" className={s.list}>
@@ -28,9 +30,29 @@ export default function ContactsList({ contacts, onDeleteContact }) {
       </TransitionGroup>
     </>
   );
-}
+ }
+
+
 
 ContactsList.propTypes = {
   contacts: PropTypes.array.isRequired,
   onDeleteContact: PropTypes.func,
 };
+
+const getVisibleContacts = (allContacts, filter) => {
+  const normalizeFilter = filter.toLowerCase();
+  return allContacts.filter(({ name }) =>
+    name.toLowerCase().includes(normalizeFilter),
+  );
+};
+
+
+const mapStateToProps = ({contacts: {items, filter}}) => ({
+  contacts: getVisibleContacts(items, filter)
+})
+
+const mapDispatchToProps = dispatch => ({
+onDeleteContact: (id) => {dispatch(contactsAction.contactDelete(id))}
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactsList);
